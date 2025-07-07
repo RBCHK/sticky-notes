@@ -1,0 +1,27 @@
+.stickyNote {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition:
+    box-shadow 0.3s,
+    z-index 0s 0.3s;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.noteText {
+  flex-grow: 1;
+  border: none;
+  background-color: transparent;
+  padding: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  color: #555555;
+  cursor: pointer;
+}
