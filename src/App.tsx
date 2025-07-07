@@ -1,21 +1,40 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import type { Note } from './types/note';
 import { StickyNote } from './components/StickyNote/StickyNote';
 import './App.css';
 
+// Constants for default note sizes
+const DEFAULT_NOTE_WIDTH = 250;
+const DEFAULT_NOTE_HEIGHT = 200;
+const DEFAULT_NOTE_COLOR = 'pink';
+const DEFAULT_NOTE_TEXT = 'What would you like to do?';
+
 function App() {
   const [notes, setNotes] = useState<Note[]>([]);
+  const [nextZIndex, setNextZIndex] = useState(1);
+  const notesAreaRef = useRef<HTMLElement>(null);
 
   function handleAddNote() {
+    const notesArea = notesAreaRef.current;
+    if (!notesArea) return;
+
+    const { width: areaWidth, height: areaHeight } = notesArea.getBoundingClientRect();
+
+    // Center the note and add a small random offset
+    const x = areaWidth / 2 - DEFAULT_NOTE_WIDTH / 2 + (Math.random() * 50 - 25);
+    const y = areaHeight / 2 - DEFAULT_NOTE_HEIGHT / 2 + (Math.random() * 50 - 25);
+
     const newNote: Note = {
       id: `note_${Date.now()}`,
-      text: 'What would you like to do?',
-      color: 'pink',
-      position: { x: 50, y: 50 },
-      size: { width: 250, height: 200 },
-      zIndex: notes.length + 1,
+      text: DEFAULT_NOTE_TEXT,
+      color: DEFAULT_NOTE_COLOR,
+      position: { x, y },
+      size: { width: DEFAULT_NOTE_WIDTH, height: DEFAULT_NOTE_HEIGHT },
+      zIndex: nextZIndex,
     };
+
     setNotes([...notes, newNote]);
+    setNextZIndex((prev) => prev + 1);
   }
 
   return (
@@ -26,7 +45,7 @@ function App() {
           + Add Note
         </button>
       </header>
-      <main className="notes-area">
+      <main className="notes-area" ref={notesAreaRef}>
         {notes.map((note) => (
           <StickyNote key={note.id} note={note} />
         ))}
