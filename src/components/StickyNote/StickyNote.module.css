@@ -14,8 +14,10 @@
 }
 
 .stickyNote.dragging {
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  transform-origin: center;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  transform: scale(1.05);
+  opacity: 0.9;
+  /* Force grabbing cursor over child elements (like textarea) during drag. */
   cursor: grabbing !important;
 }
 
@@ -28,10 +30,12 @@
   border: none;
   background-color: transparent;
   padding: 10px;
-  font-size: 14px;
+  font-size: 16px;
   font-family: inherit;
   resize: none;
   outline: none;
+  box-sizing: border-box;
+  line-height: 1.4;
   color: #555555;
   cursor: inherit;
   pointer-events: auto;
@@ -39,4 +43,13 @@
 
 .noteText:read-only {
   cursor: inherit;
+}
+
+.resizeHandle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  cursor: nwse-resize;
 }
