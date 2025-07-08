@@ -5,7 +5,7 @@
   transform: translateX(-50%);
   width: 250px;
   padding: 20px;
-  background-color: rgba(18, 73, 128, 0.2);
+  background-color: rgba(18, 73, 128, 0.1);
   border: 1px dashed #124980;
   border-radius: 12px;
   text-align: center;
@@ -15,7 +15,6 @@
     opacity 0.3s ease,
     visibility 0.3s ease,
     transform 0.3s ease;
-  /* z-index: 9998; */
 }
 
 .trashZone.visible {
@@ -25,7 +24,7 @@
 }
 
 .trashZone.active {
-  background-color: #ffaaaa;
+  background-color: rgba(255, 150, 156, 0.3);
   border-color: #ff4c4c;
   transform: translateX(-50%) scale(1.05);
 }

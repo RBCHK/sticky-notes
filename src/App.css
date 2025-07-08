@@ -28,16 +28,16 @@
 }
 
 .add-note-btn {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  color: #124980;
+  color: #072441;
   background-color: transparent;
   border: none;
   padding: 8px 16px;
   cursor: pointer;
 }
 .add-note-btn:hover {
-  color: #072441;
+  color: #124980;
 }
 
 .notes-area {
