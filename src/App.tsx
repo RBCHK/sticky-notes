@@ -100,7 +100,7 @@ function App() {
       <header className="app-header">
         <h1 className="logo">Sticky Notes</h1>
         <button className="add-note-btn" onClick={handleAddNote}>
-          + Add Note
+          Add new note
         </button>
       </header>
       <main className="notes-area" ref={notesAreaRef}>
