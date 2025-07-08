@@ -2,6 +2,7 @@ import { useCallback, useState, useRef, useEffect, memo } from 'react';
 import { useDrag } from '../../hooks/useDrag';
 import { useResize } from '../../hooks/useResize';
 import type { Note } from '../../types/note';
+
 import styles from './StickyNote.module.css';
 
 interface StickyNoteProps {
@@ -12,7 +13,7 @@ interface StickyNoteProps {
   onUpdateSize: (id: string, size: { width: number; height: number }) => void;
   onUpdateColor: (id: string) => void;
   onDragEnd: (result: { isDroppedOnTrash: boolean }) => void;
-  onHoverTrash: (isOver: boolean) => void; // New callback
+  onHoverTrash: (isOver: boolean) => void;
   boundaryElement?: HTMLElement | null;
   trashZoneRef?: React.RefObject<HTMLElement | null>;
 }
@@ -29,7 +30,7 @@ export function StickyNote({
   boundaryElement,
   trashZoneRef,
 }: StickyNoteProps) {
-  console.log(`Ререндер заметки: ${note.id}`);
+  const { isSaving } = note;
   const [isEditing, setIsEditing] = useState(false);
   const [localText, setLocalText] = useState(note.text);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -47,13 +48,10 @@ export function StickyNote({
   );
 
   const handleDragEnd = useCallback(
-    (result: { finalPosition: { x: number; y: number }; isDroppedOnTrash: boolean }) => {
-      if (!result.isDroppedOnTrash) {
-        onUpdatePosition(note.id, result.finalPosition);
-      }
-      onDragEnd({ isDroppedOnTrash: result.isDroppedOnTrash });
+    (result: { isDroppedOnTrash: boolean }) => {
+      onDragEnd(result);
     },
-    [note.id, onUpdatePosition, onDragEnd]
+    [onDragEnd]
   );
 
   const handleResize = useCallback(
@@ -85,16 +83,16 @@ export function StickyNote({
   const { handleMouseDown: handleResizeMouseDown } = useResize({
     noteRef,
     onResize: handleResize,
-    onResizeEnd: handleResize,
   });
 
   const handleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
+      if (isSaving) return;
       e.stopPropagation();
       setIsEditing(true);
       setLocalText(note.text);
     },
-    [note.text]
+    [note.text, isSaving]
   );
 
   useEffect(() => {
@@ -109,7 +107,6 @@ export function StickyNote({
 
   const handleBlur = useCallback(() => {
     setIsEditing(false);
-    // Save only when exiting edit mode
     if (localText !== note.text) {
       onUpdateText(note.id, localText);
     }
@@ -132,7 +129,7 @@ export function StickyNote({
       ref={noteRef}
       className={`${styles.stickyNote} ${isDragging ? styles.dragging : ''} ${
         isOverTrash ? styles.overTrash : ''
-      }`}
+      } ${isSaving ? styles.saving : ''}`}
       style={{
         transform: `translate(${note.position.x}px, ${note.position.y}px)`,
         width: note.size.width,
@@ -140,7 +137,7 @@ export function StickyNote({
         backgroundColor: note.color,
         zIndex: note.zIndex,
       }}
-      onMouseDown={handleDragMouseDown}
+      onMouseDown={!isSaving ? handleDragMouseDown : undefined}
       onDoubleClick={handleDoubleClick}
     >
       <div
@@ -154,9 +151,13 @@ export function StickyNote({
         value={isEditing ? localText : note.text}
         onChange={handleTextChange}
         onBlur={handleBlur}
-        readOnly={!isEditing}
+        readOnly={!isEditing || isSaving}
+        placeholder={isSaving ? 'Saving...' : '✍️ Double click here to add some text!'}
       />
-      <div className={styles.resizeHandle} onMouseDown={handleResizeMouseDown} />
+      <div
+        className={styles.resizeHandle}
+        onMouseDown={!isSaving ? handleResizeMouseDown : undefined}
+      />
     </div>
   );
 }

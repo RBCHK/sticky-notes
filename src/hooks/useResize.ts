@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 const MIN_WIDTH = 100;
 const MIN_HEIGHT = 100;
@@ -12,13 +12,11 @@ interface ResizeState {
 }
 
 interface UseResizeOptions {
-  onResizeStart?: () => void;
   onResize?: (newSize: { width: number; height: number }) => void;
-  onResizeEnd?: (finalSize: { width: number; height: number }) => void;
   noteRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export function useResize({ onResizeStart, onResize, onResizeEnd, noteRef }: UseResizeOptions) {
+export function useResize({ onResize, noteRef }: UseResizeOptions) {
   const [resizeState, setResizeState] = useState<ResizeState>({
     isResizing: false,
     startSize: { width: 0, height: 0 },
@@ -31,8 +29,6 @@ export function useResize({ onResizeStart, onResize, onResizeEnd, noteRef }: Use
       e.stopPropagation(); // Important to prevent drag
       e.preventDefault();
 
-      onResizeStart?.();
-
       const rect = noteRef.current.getBoundingClientRect();
 
       setResizeState({
@@ -41,7 +37,7 @@ export function useResize({ onResizeStart, onResize, onResizeEnd, noteRef }: Use
         startCursor: { x: e.clientX, y: e.clientY },
       });
     },
-    [noteRef, onResizeStart]
+    [noteRef]
   );
 
   useEffect(() => {
@@ -60,18 +56,7 @@ export function useResize({ onResizeStart, onResize, onResizeEnd, noteRef }: Use
       onResize?.({ width: newWidth, height: newHeight });
     };
 
-    const handleMouseUp = (e: MouseEvent) => {
-      const dx = e.clientX - resizeState.startCursor.x;
-      const dy = e.clientY - resizeState.startCursor.y;
-
-      const finalWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, resizeState.startSize.width + dx));
-      const finalHeight = Math.min(
-        MAX_HEIGHT,
-        Math.max(MIN_HEIGHT, resizeState.startSize.height + dy)
-      );
-
-      onResizeEnd?.({ width: finalWidth, height: finalHeight });
-
+    const handleMouseUp = () => {
       setResizeState((prev) => ({ ...prev, isResizing: false }));
     };
 
@@ -82,16 +67,9 @@ export function useResize({ onResizeStart, onResize, onResizeEnd, noteRef }: Use
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [
-    resizeState.isResizing,
-    resizeState.startCursor,
-    resizeState.startSize,
-    onResize,
-    onResizeEnd,
-  ]);
+  }, [resizeState.isResizing, resizeState.startCursor, resizeState.startSize, onResize]);
 
   return {
-    isResizing: resizeState.isResizing,
     handleMouseDown,
   };
 }
