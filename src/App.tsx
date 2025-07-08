@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import useLocalStorageState from './hooks/useLocalStorageState';
 import StickyNote from './components/StickyNote/StickyNote';
 import { TrashZone } from './components/TrashZone/TrashZone';
 import type { Note } from './types/note';
@@ -11,7 +12,7 @@ const DEFAULT_NOTE_COLOR = 'pink';
 const DEFAULT_NOTE_TEXT = '';
 
 function App() {
-  const [notes, setNotes] = useState<Note[]>([]);
+  const [notes, setNotes] = useLocalStorageState<Note[]>('notes', []);
   const notesAreaRef = useRef<HTMLElement>(null);
   const trashZoneRef = useRef<HTMLDivElement>(null);
   const [draggingNoteId, setDraggingNoteId] = useState<string | null>(null);
