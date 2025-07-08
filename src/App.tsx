@@ -6,9 +6,10 @@ import type { Note } from './types/note';
 
 import './App.css';
 
+const NOTE_COLORS = ['#ffc', '#cfc', '#ccf', '#fcc'];
 const DEFAULT_NOTE_WIDTH = 250;
 const DEFAULT_NOTE_HEIGHT = 200;
-const DEFAULT_NOTE_COLOR = 'pink';
+const DEFAULT_NOTE_COLOR = NOTE_COLORS[0];
 const DEFAULT_NOTE_TEXT = '';
 
 function App() {
@@ -44,6 +45,19 @@ function App() {
 
   const handleDeleteNote = useCallback((noteId: string) => {
     setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
+  }, []);
+
+  const handleUpdateNoteColor = useCallback((noteId: string) => {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) => {
+        if (note.id === noteId) {
+          const currentColorIndex = NOTE_COLORS.indexOf(note.color);
+          const nextColorIndex = (currentColorIndex + 1) % NOTE_COLORS.length;
+          return { ...note, color: NOTE_COLORS[nextColorIndex] };
+        }
+        return note;
+      })
+    );
   }, []);
 
   const handleDragEnd = useCallback(
@@ -113,6 +127,7 @@ function App() {
             onUpdatePosition={handleUpdateNotePosition}
             onUpdateText={handleUpdateNoteText}
             onUpdateSize={handleUpdateNoteSize}
+            onUpdateColor={handleUpdateNoteColor}
             onDragEnd={(result) => handleDragEnd(note.id, result)}
             onHoverTrash={setIsOverTrash}
             boundaryElement={notesAreaRef.current}

@@ -58,3 +58,20 @@
   height: 20px;
   cursor: nwse-resize;
 }
+
+.colorChangeButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(131, 49, 49, 0.1);
+  cursor: pointer;
+  background-color: #fafafa;
+  transition: transform 0.2s;
+}
+
+.colorChangeButton:hover {
+  transform: scale(1.2);
+}

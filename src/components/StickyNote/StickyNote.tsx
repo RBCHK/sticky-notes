@@ -10,6 +10,7 @@ interface StickyNoteProps {
   onUpdatePosition: (id: string, position: { x: number; y: number }) => void;
   onUpdateText: (id: string, text: string) => void;
   onUpdateSize: (id: string, size: { width: number; height: number }) => void;
+  onUpdateColor: (id: string) => void;
   onDragEnd: (result: { isDroppedOnTrash: boolean }) => void;
   onHoverTrash: (isOver: boolean) => void; // New callback
   boundaryElement?: HTMLElement | null;
@@ -22,6 +23,7 @@ export function StickyNote({
   onUpdatePosition,
   onUpdateText,
   onUpdateSize,
+  onUpdateColor,
   onDragEnd,
   onHoverTrash,
   boundaryElement,
@@ -117,6 +119,14 @@ export function StickyNote({
     setLocalText(e.target.value);
   }, []);
 
+  const handleColorChange = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onUpdateColor(note.id);
+    },
+    [note.id, onUpdateColor]
+  );
+
   return (
     <div
       ref={noteRef}
@@ -133,6 +143,7 @@ export function StickyNote({
       onMouseDown={handleDragMouseDown}
       onDoubleClick={handleDoubleClick}
     >
+      <div className={styles.colorChangeButton} onClick={handleColorChange} />
       <textarea
         ref={textareaRef}
         className={styles.noteText}
