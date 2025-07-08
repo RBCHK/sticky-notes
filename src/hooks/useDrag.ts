@@ -117,7 +117,7 @@ export function useDrag({
       onDrag?.(newPosition);
     };
 
-    const handleMouseUp = (e: MouseEvent) => {
+    const handleMouseUp = (_e: MouseEvent) => {
       if (!dragElementRef.current) return;
 
       setDragState((prev) => ({ ...prev, isDragging: false, isOverTrash: false }));
