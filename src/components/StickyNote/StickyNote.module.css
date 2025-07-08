@@ -33,6 +33,10 @@
   resize: none;
   outline: none;
   color: #555555;
-  cursor: text;
+  cursor: inherit;
   pointer-events: auto;
+}
+
+.noteText:read-only {
+  cursor: inherit;
 }

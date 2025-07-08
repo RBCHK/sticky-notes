@@ -57,6 +57,12 @@ function App() {
     );
   }
 
+  function handleUpdateNoteText(noteId: string, newText: string) {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) => (note.id === noteId ? { ...note, text: newText } : note))
+    );
+  }
+
   return (
     <div className="app-container">
       <header className="app-header">
@@ -72,6 +78,7 @@ function App() {
             note={note}
             onMoveNoteToFront={handleMoveNoteToFront}
             onUpdatePosition={handleUpdateNotePosition}
+            onUpdateText={handleUpdateNoteText}
             boundaryElement={notesAreaRef.current}
           />
         ))}
