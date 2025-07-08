@@ -10,7 +10,10 @@ interface StickyNoteProps {
   onUpdatePosition: (id: string, position: { x: number; y: number }) => void;
   onUpdateText: (id: string, text: string) => void;
   onUpdateSize: (id: string, size: { width: number; height: number }) => void;
+  onDragEnd: (result: { isDroppedOnTrash: boolean }) => void;
+  onHoverTrash: (isOver: boolean) => void; // New callback
   boundaryElement?: HTMLElement | null;
+  trashZoneRef?: React.RefObject<HTMLElement | null>;
 }
 
 export function StickyNote({
@@ -19,7 +22,10 @@ export function StickyNote({
   onUpdatePosition,
   onUpdateText,
   onUpdateSize,
+  onDragEnd,
+  onHoverTrash,
   boundaryElement,
+  trashZoneRef,
 }: StickyNoteProps) {
   console.log(`Ререндер заметки: ${note.id}`);
   const [isEditing, setIsEditing] = useState(false);
@@ -38,6 +44,16 @@ export function StickyNote({
     [note.id, onUpdatePosition]
   );
 
+  const handleDragEnd = useCallback(
+    (result: { finalPosition: { x: number; y: number }; isDroppedOnTrash: boolean }) => {
+      if (!result.isDroppedOnTrash) {
+        onUpdatePosition(note.id, result.finalPosition);
+      }
+      onDragEnd({ isDroppedOnTrash: result.isDroppedOnTrash });
+    },
+    [note.id, onUpdatePosition, onDragEnd]
+  );
+
   const handleResize = useCallback(
     (newSize: { width: number; height: number }) => {
       onUpdateSize(note.id, newSize);
@@ -45,12 +61,24 @@ export function StickyNote({
     [note.id, onUpdateSize]
   );
 
-  const { isDragging, handleMouseDown: handleDragMouseDown } = useDrag({
+  const {
+    isDragging,
+    isOverTrash,
+    handleMouseDown: handleDragMouseDown,
+  } = useDrag({
     onDragStart: handleDragStart,
     onDrag: handleDrag,
+    onDragEnd: handleDragEnd,
     boundaryElement,
     dragElementRef: noteRef,
+    trashZoneRef,
   });
+
+  useEffect(() => {
+    if (isDragging) {
+      onHoverTrash(isOverTrash);
+    }
+  }, [isDragging, isOverTrash, onHoverTrash]);
 
   const { handleMouseDown: handleResizeMouseDown } = useResize({
     noteRef,
@@ -92,7 +120,9 @@ export function StickyNote({
   return (
     <div
       ref={noteRef}
-      className={`${styles.stickyNote} ${isDragging ? styles.dragging : ''}`}
+      className={`${styles.stickyNote} ${isDragging ? styles.dragging : ''} ${
+        isOverTrash ? styles.overTrash : ''
+      }`}
       style={{
         transform: `translate(${note.position.x}px, ${note.position.y}px)`,
         width: note.size.width,

@@ -1,7 +1,8 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 interface DragState {
   isDragging: boolean;
+  isOverTrash: boolean;
   dragOffset: { x: number; y: number };
   startPosition: { x: number; y: number };
 }
@@ -9,9 +10,13 @@ interface DragState {
 interface UseDragOptions {
   onDragStart?: (e: MouseEvent) => void;
   onDrag?: (newPosition: { x: number; y: number }) => void;
-  onDragEnd?: (finalPosition: { x: number; y: number }) => void;
+  onDragEnd?: (result: {
+    finalPosition: { x: number; y: number };
+    isDroppedOnTrash: boolean;
+  }) => void;
   boundaryElement?: HTMLElement | null;
   dragElementRef: React.RefObject<HTMLDivElement | null>;
+  trashZoneRef?: React.RefObject<HTMLElement | null>;
 }
 
 export function useDrag({
@@ -20,9 +25,11 @@ export function useDrag({
   onDragEnd,
   boundaryElement,
   dragElementRef,
+  trashZoneRef,
 }: UseDragOptions) {
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
+    isOverTrash: false,
     dragOffset: { x: 0, y: 0 },
     startPosition: { x: 0, y: 0 },
   });
@@ -44,6 +51,7 @@ export function useDrag({
 
       setDragState({
         isDragging: true,
+        isOverTrash: false,
         dragOffset,
         startPosition,
       });
@@ -59,15 +67,22 @@ export function useDrag({
 
     const handleMouseMove = (e: MouseEvent) => {
       if (!dragElementRef.current) return;
-      const newPosition = {
+      let isOverTrash = false;
+      const newPositionViewport = {
         x: e.clientX - dragState.dragOffset.x,
         y: e.clientY - dragState.dragOffset.y,
       };
+      let newPosition = { ...newPositionViewport };
 
-      // Boundary checking
       if (boundaryElement) {
         const bounds = boundaryElement.getBoundingClientRect();
         const elementRect = dragElementRef.current.getBoundingClientRect();
+
+        // Convert viewport coordinates to be relative to the boundary element
+        newPosition = {
+          x: newPositionViewport.x - bounds.left,
+          y: newPositionViewport.y - bounds.top,
+        };
 
         if (elementRect) {
           newPosition.x = Math.max(0, Math.min(newPosition.x, bounds.width - elementRect.width));
@@ -75,17 +90,66 @@ export function useDrag({
         }
       }
 
+      // Check for intersection with trash zone
+      if (trashZoneRef?.current && dragElementRef.current) {
+        const trashRect = trashZoneRef.current.getBoundingClientRect();
+        const elementRect = dragElementRef.current.getBoundingClientRect();
+        const currentElementRect = {
+          left: newPositionViewport.x,
+          top: newPositionViewport.y,
+          right: newPositionViewport.x + elementRect.width,
+          bottom: newPositionViewport.y + elementRect.height,
+          width: elementRect.width,
+          height: elementRect.height,
+          x: newPositionViewport.x,
+          y: newPositionViewport.y,
+          toJSON: () => '',
+        };
+
+        if (
+          currentElementRect.left < trashRect.right &&
+          currentElementRect.right > trashRect.left &&
+          currentElementRect.top < trashRect.bottom &&
+          currentElementRect.bottom > trashRect.top
+        ) {
+          isOverTrash = true;
+        }
+      }
+
+      setDragState((prev) => ({ ...prev, isOverTrash }));
       onDrag?.(newPosition);
     };
 
     const handleMouseUp = (e: MouseEvent) => {
-      const finalPosition = {
+      if (!dragElementRef.current) return;
+      const finalPositionViewport = {
         x: e.clientX - dragState.dragOffset.x,
         y: e.clientY - dragState.dragOffset.y,
       };
 
-      setDragState((prev) => ({ ...prev, isDragging: false }));
-      onDragEnd?.(finalPosition);
+      let finalPosition = { ...finalPositionViewport };
+
+      if (boundaryElement) {
+        const bounds = boundaryElement.getBoundingClientRect();
+        const elementRect = dragElementRef.current.getBoundingClientRect();
+        finalPosition = {
+          x: finalPositionViewport.x - bounds.left,
+          y: finalPositionViewport.y - bounds.top,
+        };
+        if (elementRect) {
+          finalPosition.x = Math.max(
+            0,
+            Math.min(finalPosition.x, bounds.width - elementRect.width)
+          );
+          finalPosition.y = Math.max(
+            0,
+            Math.min(finalPosition.y, bounds.height - elementRect.height)
+          );
+        }
+      }
+
+      setDragState((prev) => ({ ...prev, isDragging: false, isOverTrash: false }));
+      onDragEnd?.({ finalPosition, isDroppedOnTrash: dragState.isOverTrash });
     };
 
     // Throttle mousemove for performance
@@ -110,10 +174,12 @@ export function useDrag({
     onDrag,
     onDragEnd,
     dragElementRef,
+    trashZoneRef,
   ]);
 
   return {
     isDragging: dragState.isDragging,
+    isOverTrash: dragState.isOverTrash,
     handleMouseDown,
   };
 }

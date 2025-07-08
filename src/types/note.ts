@@ -5,4 +5,5 @@ export interface Note {
   size: { width: number; height: number };
   color: string;
   zIndex: number;
+  isOverTrash?: boolean;
 }
