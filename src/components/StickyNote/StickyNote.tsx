@@ -3,9 +3,14 @@ import styles from './StickyNote.module.css';
 
 interface StickyNoteProps {
   note: Note;
+  onMoveNoteToFront: (id: string) => void;
 }
 
-export function StickyNote({ note }: StickyNoteProps) {
+export function StickyNote({ note, onMoveNoteToFront }: StickyNoteProps) {
+  function handleMouseDown() {
+    onMoveNoteToFront(note.id);
+  }
+
   return (
     <div
       className={styles.stickyNote}
@@ -16,6 +21,7 @@ export function StickyNote({ note }: StickyNoteProps) {
         backgroundColor: note.color,
         zIndex: note.zIndex,
       }}
+      onMouseDown={handleMouseDown}
     >
       <textarea className={styles.noteText} defaultValue={note.text} />
     </div>
