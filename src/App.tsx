@@ -208,7 +208,7 @@ function App() {
       <header className="app-header">
         <h1 className="logo">Sticky Notes</h1>
         <button className="add-note-btn" onClick={handleAddNote} disabled={isLoading}>
-          Add new note
+          + New Sticky
         </button>
       </header>
       <main className="notes-area" ref={notesAreaRef}>
@@ -216,8 +216,8 @@ function App() {
         {error && <div className="error-message">{error}</div>}
         {!isLoading && !error && notes.length === 0 && (
           <div className="empty-state">
-            <h2>No notes yet!</h2>
-            <p>Click "Add new note" to get started.</p>
+            <h2>Clean board, clean mind.</h2>
+            <p>Click "+ New Sticky" to get things going.</p>
           </div>
         )}
         {notes.map((note) => (

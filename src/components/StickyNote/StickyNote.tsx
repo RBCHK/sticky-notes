@@ -156,7 +156,7 @@ export function StickyNote({
         onChange={handleTextChange}
         onBlur={handleBlur}
         readOnly={!isEditing || isSaving}
-        placeholder={isSaving ? 'Saving...' : 'What would you like to do?'}
+        placeholder={isSaving ? 'Saving...' : '✍️ Double click here to add some text!'}
       />
       <div
         className={styles.resizeHandle}
