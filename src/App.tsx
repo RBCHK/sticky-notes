@@ -60,6 +60,15 @@ function App() {
     []
   );
 
+  const handleUpdateNoteSize = useCallback(
+    (noteId: string, newSize: { width: number; height: number }) => {
+      setNotes((prevNotes) =>
+        prevNotes.map((note) => (note.id === noteId ? { ...note, size: newSize } : note))
+      );
+    },
+    []
+  );
+
   const handleUpdateNoteText = useCallback((noteId: string, newText: string) => {
     setNotes((prevNotes) =>
       prevNotes.map((note) => (note.id === noteId ? { ...note, text: newText } : note))
@@ -82,6 +91,7 @@ function App() {
             onMoveNoteToFront={handleMoveNoteToFront}
             onUpdatePosition={handleUpdateNotePosition}
             onUpdateText={handleUpdateNoteText}
+            onUpdateSize={handleUpdateNoteSize}
             boundaryElement={notesAreaRef.current}
           />
         ))}

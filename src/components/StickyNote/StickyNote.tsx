@@ -1,5 +1,6 @@
 import { useCallback, useState, useRef, useEffect, memo } from 'react';
 import { useDrag } from '../../hooks/useDrag';
+import { useResize } from '../../hooks/useResize';
 import type { Note } from '../../types/note';
 import styles from './StickyNote.module.css';
 
@@ -8,6 +9,7 @@ interface StickyNoteProps {
   onMoveNoteToFront: (id: string) => void;
   onUpdatePosition: (id: string, position: { x: number; y: number }) => void;
   onUpdateText: (id: string, text: string) => void;
+  onUpdateSize: (id: string, size: { width: number; height: number }) => void;
   boundaryElement?: HTMLElement | null;
 }
 
@@ -16,12 +18,14 @@ export function StickyNote({
   onMoveNoteToFront,
   onUpdatePosition,
   onUpdateText,
+  onUpdateSize,
   boundaryElement,
 }: StickyNoteProps) {
   console.log(`Ререндер заметки: ${note.id}`);
   const [isEditing, setIsEditing] = useState(false);
   const [localText, setLocalText] = useState(note.text);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const noteRef = useRef<HTMLDivElement>(null);
 
   const handleDragStart = useCallback(() => {
     onMoveNoteToFront(note.id);
@@ -34,10 +38,24 @@ export function StickyNote({
     [note.id, onUpdatePosition]
   );
 
-  const { dragElementRef, isDragging, handleMouseDown } = useDrag({
+  const handleResize = useCallback(
+    (newSize: { width: number; height: number }) => {
+      onUpdateSize(note.id, newSize);
+    },
+    [note.id, onUpdateSize]
+  );
+
+  const { isDragging, handleMouseDown: handleDragMouseDown } = useDrag({
     onDragStart: handleDragStart,
     onDrag: handleDrag,
     boundaryElement,
+    dragElementRef: noteRef,
+  });
+
+  const { handleMouseDown: handleResizeMouseDown } = useResize({
+    noteRef,
+    onResize: handleResize,
+    onResizeEnd: handleResize,
   });
 
   const handleDoubleClick = useCallback(
@@ -73,7 +91,7 @@ export function StickyNote({
 
   return (
     <div
-      ref={dragElementRef}
+      ref={noteRef}
       className={`${styles.stickyNote} ${isDragging ? styles.dragging : ''}`}
       style={{
         transform: `translate(${note.position.x}px, ${note.position.y}px)`,
@@ -82,7 +100,7 @@ export function StickyNote({
         backgroundColor: note.color,
         zIndex: note.zIndex,
       }}
-      onMouseDown={handleMouseDown}
+      onMouseDown={handleDragMouseDown}
       onDoubleClick={handleDoubleClick}
     >
       <textarea
@@ -94,6 +112,7 @@ export function StickyNote({
         readOnly={!isEditing}
         placeholder={'What would you like to do?'}
       />
+      <div className={styles.resizeHandle} onMouseDown={handleResizeMouseDown} />
     </div>
   );
 }

@@ -11,16 +11,21 @@ interface UseDragOptions {
   onDrag?: (newPosition: { x: number; y: number }) => void;
   onDragEnd?: (finalPosition: { x: number; y: number }) => void;
   boundaryElement?: HTMLElement | null;
+  dragElementRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export function useDrag({ onDragStart, onDrag, onDragEnd, boundaryElement }: UseDragOptions = {}) {
+export function useDrag({
+  onDragStart,
+  onDrag,
+  onDragEnd,
+  boundaryElement,
+  dragElementRef,
+}: UseDragOptions) {
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
     dragOffset: { x: 0, y: 0 },
     startPosition: { x: 0, y: 0 },
   });
-
-  const dragElementRef = useRef<HTMLDivElement>(null);
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
@@ -46,13 +51,14 @@ export function useDrag({ onDragStart, onDrag, onDragEnd, boundaryElement }: Use
       onDragStart?.(e.nativeEvent);
       e.preventDefault();
     },
-    [onDragStart]
+    [onDragStart, dragElementRef]
   );
 
   useEffect(() => {
     if (!dragState.isDragging) return;
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (!dragElementRef.current) return;
       const newPosition = {
         x: e.clientX - dragState.dragOffset.x,
         y: e.clientY - dragState.dragOffset.y,
@@ -61,7 +67,7 @@ export function useDrag({ onDragStart, onDrag, onDragEnd, boundaryElement }: Use
       // Boundary checking
       if (boundaryElement) {
         const bounds = boundaryElement.getBoundingClientRect();
-        const elementRect = dragElementRef.current?.getBoundingClientRect();
+        const elementRect = dragElementRef.current.getBoundingClientRect();
 
         if (elementRect) {
           newPosition.x = Math.max(0, Math.min(newPosition.x, bounds.width - elementRect.width));
@@ -97,10 +103,16 @@ export function useDrag({ onDragStart, onDrag, onDragEnd, boundaryElement }: Use
       document.removeEventListener('mouseup', handleMouseUp);
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [dragState.isDragging, dragState.dragOffset, boundaryElement, onDrag, onDragEnd]);
+  }, [
+    dragState.isDragging,
+    dragState.dragOffset,
+    boundaryElement,
+    onDrag,
+    onDragEnd,
+    dragElementRef,
+  ]);
 
   return {
-    dragElementRef,
     isDragging: dragState.isDragging,
     handleMouseDown,
   };
