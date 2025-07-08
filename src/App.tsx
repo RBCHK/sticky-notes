@@ -11,7 +11,6 @@ import './App.css';
 const DEFAULT_NOTE_WIDTH = 250;
 const DEFAULT_NOTE_HEIGHT = 200;
 const DEFAULT_NOTE_COLOR = NOTE_COLORS[0];
-const DEFAULT_NOTE_TEXT = '';
 
 function App() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -56,7 +55,7 @@ function App() {
       } catch (err) {
         setError(`Failed to update note. Please try again.`);
         console.error(err);
-        setNotes(originalNotes); // Revert on failure
+        setNotes(originalNotes);
       }
     },
     [notes]
@@ -72,20 +71,19 @@ function App() {
     const y = areaHeight / 2 - DEFAULT_NOTE_HEIGHT / 2 + (Math.random() * 50 - 25);
 
     const noteData = {
-      text: DEFAULT_NOTE_TEXT,
+      text: '',
       color: DEFAULT_NOTE_COLOR,
       position: { x, y },
       size: { width: DEFAULT_NOTE_WIDTH, height: DEFAULT_NOTE_HEIGHT },
     };
 
-    // Optimistic update with a temporary ID
     const tempId = `temp_${Date.now()}`;
     const maxZIndex = notes.length > 0 ? Math.max(...notes.map((note) => note.zIndex)) : 0;
     const tempNewNote: Note = {
       ...noteData,
       id: tempId,
       zIndex: maxZIndex + 1,
-      isSaving: true, // Mark as saving
+      isSaving: true,
     };
     setNotes([...notes, tempNewNote]);
 
@@ -98,7 +96,6 @@ function App() {
     } catch (err) {
       setError('Failed to create a new note. Please try again.');
       console.error(err);
-      // Revert optimistic update
       setNotes((prevNotes) => prevNotes.filter((n) => n.id !== tempId));
     }
   }
@@ -133,22 +130,18 @@ function App() {
   );
 
   // --- Debounce Logic ---
-  // Create a stable ref to the latest handleUpdateNote function
   const handleUpdateNoteRef = useRef(handleUpdateNote);
   useEffect(() => {
     handleUpdateNoteRef.current = handleUpdateNote;
   }, [handleUpdateNote]);
 
-  // Create a memoized debounced function that never changes
   const debouncedUpdateNote = useMemo(
     () =>
       debounce((noteId: string, updatedFields: Partial<Omit<Note, 'id'>>) => {
-        // Always call the latest version of handleUpdateNote from the ref
         handleUpdateNoteRef.current(noteId, updatedFields);
       }, 300),
-    [] // Empty dependency array ensures this is created only once
+    []
   );
-  // --- End Debounce Logic ---
 
   const handleDragEnd = useCallback(
     (noteId: string, { isDroppedOnTrash }: { isDroppedOnTrash: boolean }) => {
@@ -176,11 +169,9 @@ function App() {
 
   const handleUpdateNotePosition = useCallback(
     (noteId: string, newPosition: { x: number; y: number }) => {
-      // Optimistic update for smooth dragging
       setNotes((prevNotes) =>
         prevNotes.map((note) => (note.id === noteId ? { ...note, position: newPosition } : note))
       );
-      // Debounced call for API update using our stable debounced function
       debouncedUpdateNote(noteId, { position: newPosition });
     },
     [debouncedUpdateNote]

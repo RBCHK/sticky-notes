@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+
 import styles from './TrashZone.module.css';
 
 interface TrashZoneProps {

@@ -2,6 +2,7 @@ import { useCallback, useState, useRef, useEffect, memo } from 'react';
 import { useDrag } from '../../hooks/useDrag';
 import { useResize } from '../../hooks/useResize';
 import type { Note } from '../../types/note';
+
 import styles from './StickyNote.module.css';
 
 interface StickyNoteProps {
@@ -12,7 +13,7 @@ interface StickyNoteProps {
   onUpdateSize: (id: string, size: { width: number; height: number }) => void;
   onUpdateColor: (id: string) => void;
   onDragEnd: (result: { isDroppedOnTrash: boolean }) => void;
-  onHoverTrash: (isOver: boolean) => void; // New callback
+  onHoverTrash: (isOver: boolean) => void;
   boundaryElement?: HTMLElement | null;
   trashZoneRef?: React.RefObject<HTMLElement | null>;
 }
@@ -47,13 +48,10 @@ export function StickyNote({
   );
 
   const handleDragEnd = useCallback(
-    (result: { finalPosition: { x: number; y: number }; isDroppedOnTrash: boolean }) => {
-      if (!result.isDroppedOnTrash) {
-        onUpdatePosition(note.id, result.finalPosition);
-      }
-      onDragEnd({ isDroppedOnTrash: result.isDroppedOnTrash });
+    (result: { isDroppedOnTrash: boolean }) => {
+      onDragEnd(result);
     },
-    [note.id, onUpdatePosition, onDragEnd]
+    [onDragEnd]
   );
 
   const handleResize = useCallback(
@@ -110,7 +108,6 @@ export function StickyNote({
 
   const handleBlur = useCallback(() => {
     setIsEditing(false);
-    // Save only when exiting edit mode
     if (localText !== note.text) {
       onUpdateText(note.id, localText);
     }

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 const MIN_WIDTH = 100;
 const MIN_HEIGHT = 100;
