@@ -1,12 +1,13 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { Note } from '../types/note';
 import { NOTE_COLORS } from '../types/note';
 import * as api from '../services/api';
-import { debounce } from '../utils/debounce';
+import { useDebouncedCallback } from './useDebouncedCallback';
 
 const DEFAULT_NOTE_WIDTH = 250;
 const DEFAULT_NOTE_HEIGHT = 200;
 const DEFAULT_NOTE_COLOR = NOTE_COLORS[0];
+const DEBOUNCE_DELAY = 300;
 
 interface UseNotesProps {
   notesAreaRef: React.RefObject<HTMLElement | null>;
@@ -87,7 +88,6 @@ export function useNotes({ notesAreaRef }: UseNotesProps) {
 
     try {
       const savedNote = await api.createNote(noteData);
-      // Replace temporary note with the real one from the server
       setNotes((prevNotes) =>
         prevNotes.map((n) => (n.id === tempId ? { ...savedNote, isSaving: false } : n))
       );
@@ -127,19 +127,7 @@ export function useNotes({ notesAreaRef }: UseNotesProps) {
     [notes, handleUpdateNote]
   );
 
-  // --- Debounce Logic ---
-  const handleUpdateNoteRef = useRef(handleUpdateNote);
-  useEffect(() => {
-    handleUpdateNoteRef.current = handleUpdateNote;
-  }, [handleUpdateNote]);
-
-  const debouncedUpdateNote = useMemo(
-    () =>
-      debounce((noteId: string, updatedFields: Partial<Omit<Note, 'id'>>) => {
-        handleUpdateNoteRef.current(noteId, updatedFields);
-      }, 300),
-    []
-  );
+  const debouncedUpdateNote = useDebouncedCallback(handleUpdateNote, DEBOUNCE_DELAY);
 
   const handleDragEnd = useCallback(
     (noteId: string, { isDroppedOnTrash }: { isDroppedOnTrash: boolean }) => {
