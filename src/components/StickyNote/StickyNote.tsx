@@ -1,19 +1,42 @@
+import { useCallback } from 'react';
+import { useDrag } from '../../hooks/useDrag';
 import type { Note } from '../../types/note';
 import styles from './StickyNote.module.css';
 
 interface StickyNoteProps {
   note: Note;
   onMoveNoteToFront: (id: string) => void;
+  onUpdatePosition: (id: string, position: { x: number; y: number }) => void;
+  boundaryElement?: HTMLElement | null;
 }
 
-export function StickyNote({ note, onMoveNoteToFront }: StickyNoteProps) {
-  function handleMouseDown() {
+export function StickyNote({
+  note,
+  onMoveNoteToFront,
+  onUpdatePosition,
+  boundaryElement,
+}: StickyNoteProps) {
+  const handleDragStart = useCallback(() => {
     onMoveNoteToFront(note.id);
-  }
+  }, [note.id, onMoveNoteToFront]);
+
+  const handleDrag = useCallback(
+    (newPosition: { x: number; y: number }) => {
+      onUpdatePosition(note.id, newPosition);
+    },
+    [note.id, onUpdatePosition]
+  );
+
+  const { dragElementRef, isDragging, handleMouseDown } = useDrag({
+    onDragStart: handleDragStart,
+    onDrag: handleDrag,
+    boundaryElement,
+  });
 
   return (
     <div
-      className={styles.stickyNote}
+      ref={dragElementRef}
+      className={`${styles.stickyNote} ${isDragging ? styles.dragging : ''}`}
       style={{
         transform: `translate(${note.position.x}px, ${note.position.y}px)`,
         width: note.size.width,
@@ -23,7 +46,11 @@ export function StickyNote({ note, onMoveNoteToFront }: StickyNoteProps) {
       }}
       onMouseDown={handleMouseDown}
     >
-      <textarea className={styles.noteText} defaultValue={note.text} />
+      <textarea
+        className={styles.noteText}
+        defaultValue={note.text}
+        onMouseDown={(e) => e.stopPropagation()} // Prevent drag when editing text
+      />
     </div>
   );
 }

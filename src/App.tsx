@@ -51,6 +51,12 @@ function App() {
     });
   }
 
+  function handleUpdateNotePosition(noteId: string, newPosition: { x: number; y: number }) {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) => (note.id === noteId ? { ...note, position: newPosition } : note))
+    );
+  }
+
   return (
     <div className="app-container">
       <header className="app-header">
@@ -61,7 +67,13 @@ function App() {
       </header>
       <main className="notes-area" ref={notesAreaRef}>
         {notes.map((note) => (
-          <StickyNote key={note.id} note={note} onMoveNoteToFront={handleMoveNoteToFront} />
+          <StickyNote
+            key={note.id}
+            note={note}
+            onMoveNoteToFront={handleMoveNoteToFront}
+            onUpdatePosition={handleUpdateNotePosition}
+            boundaryElement={notesAreaRef.current}
+          />
         ))}
       </main>
     </div>
