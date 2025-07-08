@@ -6,11 +6,21 @@
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition:
-    box-shadow 0.3s,
-    z-index 0s 0.3s;
+    box-shadow 0.3s ease,
+    transform 0.1s ease;
   display: flex;
   flex-direction: column;
-  cursor: pointer;
+  cursor: grab;
+}
+
+.stickyNote.dragging {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  transform-origin: center;
+  cursor: grabbing !important;
+}
+
+.stickyNote:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
 }
 
 .noteText {
@@ -23,5 +33,10 @@
   resize: none;
   outline: none;
   color: #555555;
-  cursor: pointer;
+  cursor: inherit;
+  pointer-events: auto;
+}
+
+.noteText:read-only {
+  cursor: inherit;
 }
