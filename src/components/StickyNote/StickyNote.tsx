@@ -83,7 +83,6 @@ export function StickyNote({
   const { handleMouseDown: handleResizeMouseDown } = useResize({
     noteRef,
     onResize: handleResize,
-    onResizeEnd: handleResize,
   });
 
   const handleDoubleClick = useCallback(
