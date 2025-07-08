@@ -5,8 +5,8 @@
   transform: translateX(-50%);
   width: 250px;
   padding: 20px;
-  background-color: #ffcccc;
-  border: 2px dashed #ff7f7f;
+  background-color: rgba(18, 73, 128, 0.2);
+  border: 1px dashed #124980;
   border-radius: 12px;
   text-align: center;
   opacity: 0;
@@ -15,7 +15,7 @@
     opacity 0.3s ease,
     visibility 0.3s ease,
     transform 0.3s ease;
-  z-index: 9998;
+  /* z-index: 9998; */
 }
 
 .trashZone.visible {
@@ -38,6 +38,6 @@
 .trashText {
   margin: 0;
   font-size: 16px;
-  color: #a52a2a;
+  color: #072441;
   font-weight: 500;
 }

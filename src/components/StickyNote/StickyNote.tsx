@@ -127,6 +127,15 @@ export function StickyNote({
     [note.id, onUpdateColor]
   );
 
+  let scale = 1;
+  if (isOverTrash) {
+    scale = 0.5;
+  } else if (isDragging) {
+    scale = 1.05;
+  }
+
+  const transform = `translate(${note.position.x}px, ${note.position.y}px) scale(${scale})`;
+
   return (
     <div
       ref={noteRef}
@@ -134,7 +143,7 @@ export function StickyNote({
         isOverTrash ? styles.overTrash : ''
       }`}
       style={{
-        transform: `translate(${note.position.x}px, ${note.position.y}px)`,
+        transform,
         width: note.size.width,
         height: note.size.height,
         backgroundColor: note.color,
@@ -143,7 +152,11 @@ export function StickyNote({
       onMouseDown={handleDragMouseDown}
       onDoubleClick={handleDoubleClick}
     >
-      <div className={styles.colorChangeButton} onClick={handleColorChange} />
+      <div
+        className={styles.colorChangeButton}
+        onClick={handleColorChange}
+        onMouseDown={(e) => e.stopPropagation()}
+      />
       <textarea
         ref={textareaRef}
         className={styles.noteText}
@@ -151,7 +164,7 @@ export function StickyNote({
         onChange={handleTextChange}
         onBlur={handleBlur}
         readOnly={!isEditing}
-        placeholder={'What would you like to do?'}
+        // placeholder={'What would you like to do?'}
       />
       <div className={styles.resizeHandle} onMouseDown={handleResizeMouseDown} />
     </div>

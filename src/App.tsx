@@ -3,10 +3,10 @@ import useLocalStorageState from './hooks/useLocalStorageState';
 import StickyNote from './components/StickyNote/StickyNote';
 import { TrashZone } from './components/TrashZone/TrashZone';
 import type { Note } from './types/note';
+import { NOTE_COLORS } from './types/note';
 
 import './App.css';
 
-const NOTE_COLORS = ['#ffc', '#cfc', '#ccf', '#fcc'];
 const DEFAULT_NOTE_WIDTH = 250;
 const DEFAULT_NOTE_HEIGHT = 200;
 const DEFAULT_NOTE_COLOR = NOTE_COLORS[0];
@@ -115,7 +115,7 @@ function App() {
       <header className="app-header">
         <h1 className="logo">Sticky Notes</h1>
         <button className="add-note-btn" onClick={handleAddNote}>
-          Add new note
+          + New Sticky
         </button>
       </header>
       <main className="notes-area" ref={notesAreaRef}>

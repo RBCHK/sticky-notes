@@ -15,15 +15,14 @@
 
 .stickyNote.dragging {
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-  transform: scale(1.05);
   opacity: 0.9;
+  z-index: 9999 !important;
   /* Force grabbing cursor over child elements (like textarea) during drag. */
   cursor: grabbing !important;
 }
 
 .stickyNote.overTrash {
-  opacity: 0.5;
-  transform: scale(0.9);
+  opacity: 0.8;
 }
 
 .stickyNote:hover {

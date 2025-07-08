@@ -17,7 +17,7 @@ export const TrashZone = forwardRef<HTMLDivElement, TrashZoneProps>(function Tra
         isOverTrash ? styles.active : ''
       }`}
     >
-      <p className={styles.trashText}>Drag here to delete</p>
+      <p className={styles.trashText}>Drag here to remove sticky</p>
     </div>
   );
 });
