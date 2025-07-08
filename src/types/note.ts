@@ -10,4 +10,5 @@ export interface Note {
   color: NoteColor;
   zIndex: number;
   isOverTrash?: boolean;
+  isSaving?: boolean;
 }

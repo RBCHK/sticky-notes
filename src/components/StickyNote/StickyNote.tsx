@@ -29,7 +29,7 @@ export function StickyNote({
   boundaryElement,
   trashZoneRef,
 }: StickyNoteProps) {
-  console.log(`Ререндер заметки: ${note.id}`);
+  const { isSaving } = note;
   const [isEditing, setIsEditing] = useState(false);
   const [localText, setLocalText] = useState(note.text);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -90,11 +90,12 @@ export function StickyNote({
 
   const handleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
+      if (isSaving) return;
       e.stopPropagation();
       setIsEditing(true);
       setLocalText(note.text);
     },
-    [note.text]
+    [note.text, isSaving]
   );
 
   useEffect(() => {
@@ -132,7 +133,7 @@ export function StickyNote({
       ref={noteRef}
       className={`${styles.stickyNote} ${isDragging ? styles.dragging : ''} ${
         isOverTrash ? styles.overTrash : ''
-      }`}
+      } ${isSaving ? styles.saving : ''}`}
       style={{
         transform: `translate(${note.position.x}px, ${note.position.y}px)`,
         width: note.size.width,
@@ -140,7 +141,7 @@ export function StickyNote({
         backgroundColor: note.color,
         zIndex: note.zIndex,
       }}
-      onMouseDown={handleDragMouseDown}
+      onMouseDown={!isSaving ? handleDragMouseDown : undefined}
       onDoubleClick={handleDoubleClick}
     >
       <div
@@ -154,9 +155,13 @@ export function StickyNote({
         value={isEditing ? localText : note.text}
         onChange={handleTextChange}
         onBlur={handleBlur}
-        readOnly={!isEditing}
+        readOnly={!isEditing || isSaving}
+        placeholder={isSaving ? 'Saving...' : 'What would you like to do?'}
       />
-      <div className={styles.resizeHandle} onMouseDown={handleResizeMouseDown} />
+      <div
+        className={styles.resizeHandle}
+        onMouseDown={!isSaving ? handleResizeMouseDown : undefined}
+      />
     </div>
   );
 }

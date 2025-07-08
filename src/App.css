@@ -45,3 +45,32 @@
   position: relative;
   overflow: auto;
 }
+
+.loading-indicator,
+.error-message,
+.empty-state {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 1.5rem;
+  color: #888;
+}
+
+.error-message {
+  color: #d9534f;
+  background-color: #f2dede;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  border: 1px solid #ebccd1;
+}
+
+.empty-state h2 {
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  color: #aaa;
+}

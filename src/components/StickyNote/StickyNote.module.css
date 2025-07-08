@@ -56,17 +56,18 @@
 
 .colorChangeButton {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 16px;
-  height: 16px;
+  top: 5px;
+  right: 5px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
-  border: 1px solid rgba(131, 49, 49, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  background-color: #fafafa;
-  transition: transform 0.2s;
+  background-color: #fff; /* Just an example, can be transparent */
 }
 
-.colorChangeButton:hover {
-  transform: scale(1.2);
+.stickyNote.saving {
+  opacity: 0.7;
+  cursor: wait;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
