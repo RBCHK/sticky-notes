@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef, useEffect } from 'react';
+import { useCallback, useState, useRef, useEffect, memo } from 'react';
 import { useDrag } from '../../hooks/useDrag';
 import type { Note } from '../../types/note';
 import styles from './StickyNote.module.css';
@@ -18,6 +18,7 @@ export function StickyNote({
   onUpdateText,
   boundaryElement,
 }: StickyNoteProps) {
+  console.log(`Ререндер заметки: ${note.id}`);
   const [isEditing, setIsEditing] = useState(false);
   const [localText, setLocalText] = useState(note.text);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -91,7 +92,10 @@ export function StickyNote({
         onChange={handleTextChange}
         onBlur={handleBlur}
         readOnly={!isEditing}
+        placeholder={'What would you like to do?'}
       />
     </div>
   );
 }
+
+export default memo(StickyNote);

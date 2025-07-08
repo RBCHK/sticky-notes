@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { StickyNote } from './components/StickyNote/StickyNote';
+import { useState, useRef, useCallback } from 'react';
+import StickyNote from './components/StickyNote/StickyNote';
 import type { Note } from './types/note';
 
 import './App.css';
@@ -7,7 +7,7 @@ import './App.css';
 const DEFAULT_NOTE_WIDTH = 250;
 const DEFAULT_NOTE_HEIGHT = 200;
 const DEFAULT_NOTE_COLOR = 'pink';
-const DEFAULT_NOTE_TEXT = 'What would you like to do?';
+const DEFAULT_NOTE_TEXT = '';
 
 function App() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -37,7 +37,7 @@ function App() {
     setNotes([...notes, newNote]);
   }
 
-  function handleMoveNoteToFront(noteId: string) {
+  const handleMoveNoteToFront = useCallback((noteId: string) => {
     setNotes((prevNotes) => {
       const maxZIndex =
         prevNotes.length > 0 ? Math.max(...prevNotes.map((note) => note.zIndex)) : 0;
@@ -49,19 +49,22 @@ function App() {
 
       return prevNotes.map((n) => (n.id === noteId ? { ...n, zIndex: maxZIndex + 1 } : n));
     });
-  }
+  }, []);
 
-  function handleUpdateNotePosition(noteId: string, newPosition: { x: number; y: number }) {
-    setNotes((prevNotes) =>
-      prevNotes.map((note) => (note.id === noteId ? { ...note, position: newPosition } : note))
-    );
-  }
+  const handleUpdateNotePosition = useCallback(
+    (noteId: string, newPosition: { x: number; y: number }) => {
+      setNotes((prevNotes) =>
+        prevNotes.map((note) => (note.id === noteId ? { ...note, position: newPosition } : note))
+      );
+    },
+    []
+  );
 
-  function handleUpdateNoteText(noteId: string, newText: string) {
+  const handleUpdateNoteText = useCallback((noteId: string, newText: string) => {
     setNotes((prevNotes) =>
       prevNotes.map((note) => (note.id === noteId ? { ...note, text: newText } : note))
     );
-  }
+  }, []);
 
   return (
     <div className="app-container">
