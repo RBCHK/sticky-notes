@@ -1,0 +1,43 @@
+.trashZone {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 250px;
+  padding: 20px;
+  background-color: #ffcccc;
+  border: 2px dashed #ff7f7f;
+  border-radius: 12px;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease,
+    transform 0.3s ease;
+  z-index: 9998;
+}
+
+.trashZone.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.trashZone.active {
+  background-color: #ffaaaa;
+  border-color: #ff4c4c;
+  transform: translateX(-50%) scale(1.05);
+}
+
+.trashIcon {
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+
+.trashText {
+  margin: 0;
+  font-size: 16px;
+  color: #a52a2a;
+  font-weight: 500;
+}

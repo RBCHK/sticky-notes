@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import StickyNote from './components/StickyNote/StickyNote';
+import { TrashZone } from './components/TrashZone/TrashZone';
 import type { Note } from './types/note';
 
 import './App.css';
@@ -12,6 +13,9 @@ const DEFAULT_NOTE_TEXT = '';
 function App() {
   const [notes, setNotes] = useState<Note[]>([]);
   const notesAreaRef = useRef<HTMLElement>(null);
+  const trashZoneRef = useRef<HTMLDivElement>(null);
+  const [draggingNoteId, setDraggingNoteId] = useState<string | null>(null);
+  const [isOverTrash, setIsOverTrash] = useState(false);
 
   function handleAddNote() {
     const notesArea = notesAreaRef.current;
@@ -37,7 +41,23 @@ function App() {
     setNotes([...notes, newNote]);
   }
 
+  const handleDeleteNote = useCallback((noteId: string) => {
+    setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
+  }, []);
+
+  const handleDragEnd = useCallback(
+    (noteId: string, { isDroppedOnTrash }: { isDroppedOnTrash: boolean }) => {
+      if (isDroppedOnTrash) {
+        handleDeleteNote(noteId);
+      }
+      setDraggingNoteId(null);
+      setIsOverTrash(false);
+    },
+    [handleDeleteNote]
+  );
+
   const handleMoveNoteToFront = useCallback((noteId: string) => {
+    setDraggingNoteId(noteId);
     setNotes((prevNotes) => {
       const maxZIndex =
         prevNotes.length > 0 ? Math.max(...prevNotes.map((note) => note.zIndex)) : 0;
@@ -92,10 +112,14 @@ function App() {
             onUpdatePosition={handleUpdateNotePosition}
             onUpdateText={handleUpdateNoteText}
             onUpdateSize={handleUpdateNoteSize}
+            onDragEnd={(result) => handleDragEnd(note.id, result)}
+            onHoverTrash={setIsOverTrash}
             boundaryElement={notesAreaRef.current}
+            trashZoneRef={trashZoneRef}
           />
         ))}
       </main>
+      <TrashZone ref={trashZoneRef} isDragging={!!draggingNoteId} isOverTrash={isOverTrash} />
     </div>
   );
 }
