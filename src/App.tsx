@@ -1,17 +1,19 @@
 import { useState, useRef, useCallback } from 'react';
+import useLocalStorageState from './hooks/useLocalStorageState';
 import StickyNote from './components/StickyNote/StickyNote';
 import { TrashZone } from './components/TrashZone/TrashZone';
 import type { Note } from './types/note';
+import { NOTE_COLORS } from './types/note';
 
 import './App.css';
 
 const DEFAULT_NOTE_WIDTH = 250;
 const DEFAULT_NOTE_HEIGHT = 200;
-const DEFAULT_NOTE_COLOR = 'pink';
+const DEFAULT_NOTE_COLOR = NOTE_COLORS[0];
 const DEFAULT_NOTE_TEXT = '';
 
 function App() {
-  const [notes, setNotes] = useState<Note[]>([]);
+  const [notes, setNotes] = useLocalStorageState<Note[]>('notes', []);
   const notesAreaRef = useRef<HTMLElement>(null);
   const trashZoneRef = useRef<HTMLDivElement>(null);
   const [draggingNoteId, setDraggingNoteId] = useState<string | null>(null);
@@ -43,6 +45,19 @@ function App() {
 
   const handleDeleteNote = useCallback((noteId: string) => {
     setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
+  }, []);
+
+  const handleUpdateNoteColor = useCallback((noteId: string) => {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) => {
+        if (note.id === noteId) {
+          const currentColorIndex = NOTE_COLORS.indexOf(note.color);
+          const nextColorIndex = (currentColorIndex + 1) % NOTE_COLORS.length;
+          return { ...note, color: NOTE_COLORS[nextColorIndex] };
+        }
+        return note;
+      })
+    );
   }, []);
 
   const handleDragEnd = useCallback(
@@ -100,7 +115,7 @@ function App() {
       <header className="app-header">
         <h1 className="logo">Sticky Notes</h1>
         <button className="add-note-btn" onClick={handleAddNote}>
-          Add new note
+          + New Sticky
         </button>
       </header>
       <main className="notes-area" ref={notesAreaRef}>
@@ -112,6 +127,7 @@ function App() {
             onUpdatePosition={handleUpdateNotePosition}
             onUpdateText={handleUpdateNoteText}
             onUpdateSize={handleUpdateNoteSize}
+            onUpdateColor={handleUpdateNoteColor}
             onDragEnd={(result) => handleDragEnd(note.id, result)}
             onHoverTrash={setIsOverTrash}
             boundaryElement={notesAreaRef.current}

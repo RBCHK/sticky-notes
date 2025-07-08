@@ -4,30 +4,25 @@
   left: 0;
   padding: 10px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition:
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  /* transition:
     box-shadow 0.3s ease,
-    transform 0.1s ease;
+    transform 0.1s ease; */
   display: flex;
   flex-direction: column;
   cursor: grab;
 }
 
+.stickyNote:hover {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
 .stickyNote.dragging {
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-  transform: scale(1.05);
-  opacity: 0.9;
-  /* Force grabbing cursor over child elements (like textarea) during drag. */
-  cursor: grabbing !important;
+  cursor: grabbing !important; /* Force grabbing cursor over child elements (like textarea) during drag. */
 }
 
 .stickyNote.overTrash {
-  opacity: 0.5;
-  transform: scale(0.9);
-}
-
-.stickyNote:hover {
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  opacity: 0.4;
 }
 
 .noteText {
@@ -57,4 +52,21 @@
   width: 20px;
   height: 20px;
   cursor: nwse-resize;
+}
+
+.colorChangeButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(131, 49, 49, 0.1);
+  cursor: pointer;
+  background-color: #fafafa;
+  transition: transform 0.2s;
+}
+
+.colorChangeButton:hover {
+  transform: scale(1.2);
 }
