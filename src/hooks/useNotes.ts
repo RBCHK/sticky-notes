@@ -60,7 +60,34 @@ export function useNotes({ notesAreaRef }: UseNotesProps) {
     [notes]
   );
 
-  async function handleAddNote() {
+  const createNoteByDrawing = useCallback(
+    async (noteData: Omit<Note, 'id' | 'zIndex' | 'isSaving'>) => {
+      const tempId = `temp_${Date.now()}`;
+      const maxZIndex = notes.length > 0 ? Math.max(...notes.map((note) => note.zIndex)) : 0;
+      const tempNewNote: Note = {
+        ...noteData,
+        id: tempId,
+        zIndex: maxZIndex + 1,
+        isSaving: true,
+      };
+
+      setNotes((prevNotes) => [...prevNotes, tempNewNote]);
+
+      try {
+        const savedNote = await api.createNote(noteData);
+        setNotes((prevNotes) =>
+          prevNotes.map((n) => (n.id === tempId ? { ...savedNote, isSaving: false } : n))
+        );
+      } catch (err) {
+        setError('Failed to create a new note. Please try again.');
+        console.error(err);
+        setNotes((prevNotes) => prevNotes.filter((n) => n.id !== tempId));
+      }
+    },
+    [notes]
+  );
+
+  const handleAddNote = useCallback(() => {
     const notesArea = notesAreaRef.current;
     if (!notesArea) return;
 
@@ -69,34 +96,13 @@ export function useNotes({ notesAreaRef }: UseNotesProps) {
     const x = areaWidth / 2 - DEFAULT_NOTE_WIDTH / 2 + (Math.random() * 50 - 25);
     const y = areaHeight / 2 - DEFAULT_NOTE_HEIGHT / 2 + (Math.random() * 50 - 25);
 
-    const noteData = {
+    createNoteByDrawing({
       text: '',
       color: DEFAULT_NOTE_COLOR,
       position: { x, y },
       size: { width: DEFAULT_NOTE_WIDTH, height: DEFAULT_NOTE_HEIGHT },
-    };
-
-    const tempId = `temp_${Date.now()}`;
-    const maxZIndex = notes.length > 0 ? Math.max(...notes.map((note) => note.zIndex)) : 0;
-    const tempNewNote: Note = {
-      ...noteData,
-      id: tempId,
-      zIndex: maxZIndex + 1,
-      isSaving: true,
-    };
-    setNotes([...notes, tempNewNote]);
-
-    try {
-      const savedNote = await api.createNote(noteData);
-      setNotes((prevNotes) =>
-        prevNotes.map((n) => (n.id === tempId ? { ...savedNote, isSaving: false } : n))
-      );
-    } catch (err) {
-      setError('Failed to create a new note. Please try again.');
-      console.error(err);
-      setNotes((prevNotes) => prevNotes.filter((n) => n.id !== tempId));
-    }
-  }
+    });
+  }, [notesAreaRef, createNoteByDrawing]);
 
   const handleDeleteNote = useCallback(
     async (noteId: string) => {
@@ -187,6 +193,7 @@ export function useNotes({ notesAreaRef }: UseNotesProps) {
     draggingNoteId,
     isOverTrash,
     handleAddNote,
+    createNoteByDrawing,
     handleDragEnd,
     handleMoveNoteToFront,
     handleUpdateNotePosition,
