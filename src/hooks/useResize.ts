@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
 
-const MIN_WIDTH = 100;
-const MIN_HEIGHT = 100;
-const MAX_WIDTH = 450;
-const MAX_HEIGHT = 450;
+export const MIN_WIDTH = 50;
+export const MIN_HEIGHT = 50;
+export const MAX_WIDTH = 450;
+export const MAX_HEIGHT = 450;
 
 interface ResizeState {
   isResizing: boolean;
