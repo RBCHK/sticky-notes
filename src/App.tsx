@@ -152,7 +152,7 @@ function App() {
         {!isLoading && !error && notes.length === 0 && (
           <div className="empty-state">
             <h2>Clean board, clean mind.</h2>
-            <p>Click "+ New Sticky" to get things going.</p>
+            <p>Click '+ New Sticky' button or just Drag anywhere to get things going.</p>
           </div>
         )}
         {notes.map((note) => (
