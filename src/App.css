@@ -85,3 +85,17 @@
   border-radius: 8px;
   pointer-events: none;
 }
+
+.app-container.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.app-container.no-select textarea {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}

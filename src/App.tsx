@@ -131,7 +131,7 @@ function App() {
   }, [isDrawing, stopDrawing]);
 
   return (
-    <div className="app-container">
+    <div className={`app-container ${isDrawing ? 'no-select' : ''}`}>
       <header className="app-header">
         <h1 className="logo">Sticky Notes</h1>
         <button className="add-note-btn" onClick={handleAddNote} disabled={isLoading}>
